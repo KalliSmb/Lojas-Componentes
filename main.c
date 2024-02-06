@@ -62,6 +62,13 @@ int signup(struct Utilizador utilizadores[], int totalUtilizadores)
         printf("Email: ");
         scanf("%s", novoUtilizador.email);
 
+        // Verifica se o email contém '@'
+        if (strchr(novoUtilizador.email, '@') == NULL)
+        {
+            printf("Erro! O email deve conter '@'.\n");
+            continue;
+        }
+
         printf("Idade: ");
         if (scanf("%d", &novoUtilizador.idade) != 1 || novoUtilizador.idade <= 0)
         {
@@ -71,12 +78,28 @@ int signup(struct Utilizador utilizadores[], int totalUtilizadores)
         }
 
         printf("Telefone: ");
-        if (scanf("%d", &novoUtilizador.contacto) != 1)
+        char telefone[20]; // Usamos uma string para armazenar temporariamente o telefone
+        scanf("%s", telefone);
+
+        // Verifica se o telefone contém apenas dígitos
+        int valido = 1;
+        for (int i = 0; telefone[i] != '\0'; i++)
         {
-            printf("Erro! Telefone inválido.\n");
-            while (getchar() != '\n');  // Limpa o buffer do teclado
+            if (!isdigit(telefone[i]))
+            {
+                valido = 0;
+                break;
+            }
+        }
+
+        if (!valido)
+        {
+            printf("Erro! O telefone deve conter apenas números.\n");
             continue;
         }
+
+        // Se chegou até aqui, convertemos o telefone para inteiro e atribuímos à estrutura
+        novoUtilizador.contacto = atoi(telefone);
 
         printf("Password: ");
         scanf("%s", novoUtilizador.password);
@@ -97,7 +120,6 @@ int signup(struct Utilizador utilizadores[], int totalUtilizadores)
         }
     } while (1);
 }
-
 
 int main()
 {
