@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #define MAX_UTILIZADORES 100
 
@@ -27,6 +28,19 @@ int login(struct Utilizador utilizadores[], int totalUtilizadores, char email[],
     return -1;  // Retorna -1 se o login falhar
 }
 
+// Função para verificar se uma string contém apenas letras
+int contemApenasLetras(const char *str)
+{
+    for (int i = 0; str[i] != '\0'; i++)
+    {
+        if (!isalpha(str[i]))
+        {
+            return 0; // Se não for uma letra, retorna 0
+        }
+    }
+    return 1; // Se passar por todos os caracteres e todos forem letras, retorna 1
+}
+
 // Função para realizar o registo
 int signup(struct Utilizador utilizadores[], int totalUtilizadores)
 {
@@ -38,13 +52,20 @@ int signup(struct Utilizador utilizadores[], int totalUtilizadores)
         printf("Nome: ");
         scanf("%s", novoUtilizador.nome);
 
+        // Verifica se o nome contém apenas letras
+        if (!contemApenasLetras(novoUtilizador.nome))
+        {
+            printf("Erro! O nome deve conter apenas letras.\n");
+            continue;
+        }
+
         printf("Email: ");
         scanf("%s", novoUtilizador.email);
 
         printf("Idade: ");
-        if (scanf("%d", &novoUtilizador.idade) != 1)
+        if (scanf("%d", &novoUtilizador.idade) != 1 || novoUtilizador.idade <= 0)
         {
-            printf("Erro! Idade inválida.\n");
+            printf("Erro! Idade inválida. A idade deve ser maior que 0.\n");
             while (getchar() != '\n');  // Limpa o buffer do teclado
             continue;
         }
@@ -76,6 +97,7 @@ int signup(struct Utilizador utilizadores[], int totalUtilizadores)
         }
     } while (1);
 }
+
 
 int main()
 {
