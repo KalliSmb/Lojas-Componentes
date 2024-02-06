@@ -32,35 +32,49 @@ int signup(struct Utilizador utilizadores[], int totalUtilizadores)
 {
     struct Utilizador novoUtilizador;
 
-    printf("Nome: ");
-    scanf("%s", novoUtilizador.nome);
-
-    printf("Email: ");
-    scanf("%s", novoUtilizador.email);
-
-    printf("Idade: ");
-    scanf("%d", &novoUtilizador.idade);
-
-    printf("Telefone: ");
-    scanf("%d", &novoUtilizador.contacto);
-
-    printf("Password: ");
-    scanf("%s", novoUtilizador.password);
-
-    printf("Confirmar a password: ");
-    scanf("%s", novoUtilizador.confirmarPassword);
-
-    if (strcmp(novoUtilizador.password, novoUtilizador.confirmarPassword) == 0)
+    // Loop até que o registo seja bem-sucedido
+    do
     {
-        // Adiciona o novo usuário ao array
-        utilizadores[totalUtilizadores] = novoUtilizador;
-        printf("Registo bem-sucedido!\n");
-        return totalUtilizadores + 1;  // Retorna o novo total de usuários
-    }
-    else
-    {
-        printf("Erro! As passwords devem ser iguais.\n");
-    }
+        printf("Nome: ");
+        scanf("%s", novoUtilizador.nome);
+
+        printf("Email: ");
+        scanf("%s", novoUtilizador.email);
+
+        printf("Idade: ");
+        if (scanf("%d", &novoUtilizador.idade) != 1)
+        {
+            printf("Erro! Idade inválida.\n");
+            while (getchar() != '\n');  // Limpa o buffer do teclado
+            continue;
+        }
+
+        printf("Telefone: ");
+        if (scanf("%d", &novoUtilizador.contacto) != 1)
+        {
+            printf("Erro! Telefone inválido.\n");
+            while (getchar() != '\n');  // Limpa o buffer do teclado
+            continue;
+        }
+
+        printf("Password: ");
+        scanf("%s", novoUtilizador.password);
+
+        printf("Confirmar a password: ");
+        scanf("%s", novoUtilizador.confirmarPassword);
+
+        if (strcmp(novoUtilizador.password, novoUtilizador.confirmarPassword) == 0)
+        {
+            // Adiciona o novo usuário ao array
+            utilizadores[totalUtilizadores] = novoUtilizador;
+            printf("Registo bem-sucedido!\n");
+            return totalUtilizadores + 1;  // Retorna o novo total de usuários
+        }
+        else
+        {
+            printf("Erro! As passwords devem ser iguais.\n");
+        }
+    } while (1);
 }
 
 int main()
