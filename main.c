@@ -150,6 +150,27 @@ int main()
 
                     if (index != -1) {
                         printf("Login bem-sucedido! Bem-vindo, %s!\n", utilizadores[index].nome);
+                        // Após o login bem-sucedido, ofereça opções adicionais
+                        int opcao;
+                        do {
+                            printf("\n1. Procurar por loja\n2. Procurar por produto\n3. Voltar para a página de login/signup\nEscolha: ");
+                            scanf("%d", &opcao);
+                            switch (opcao) {
+                                case 1:
+                                    printf("Opção 'Procurar por loja' selecionada.\n");
+                                    // Lógica para procurar por loja
+                                    break;
+                                case 2:
+                                    printf("Opção 'Procurar por produto' selecionada.\n");
+                                    // Lógica para procurar por produto
+                                    break;
+                                case 3:
+                                    printf("Voltando para a página de login/signup...\n");
+                                    break;
+                                default:
+                                    printf("Opção inválida. Por favor, escolha novamente.\n");
+                            }
+                        } while (opcao != 3); // Continue até que o usuário opte por voltar
                     } else {
                         printf("Login incorreto.\n");
                     }
