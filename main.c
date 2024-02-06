@@ -3,8 +3,9 @@
 #include <ctype.h>
 
 #define MAX_UTILIZADORES 100
+#define MAX_COMPONENTES 100
+#define MAX_LOJAS 5
 
-// Estrutura para armazenar informações do utilizador
 struct Utilizador {
     char nome[35];
     int idade;
@@ -14,45 +15,53 @@ struct Utilizador {
     char confirmarPassword[20];
 };
 
-// Função para realizar o login
+struct Componente {
+    int id;
+    char nome[50];
+    float custo;
+    int quantidade;
+};
+
+struct Loja {
+    int id;
+    char nome[50];
+    struct Componente componentes[MAX_COMPONENTES];
+    int num_componentes;
+};
+
 int login(struct Utilizador utilizadores[], int totalUtilizadores, char email[], char password[])
 {
-    // Ciclo para percorrer todos os utilizadores
     for (int i = 0; i < totalUtilizadores; ++i)
     {
-        if (strcmp(utilizadores[i].email, email) == 0 && strcmp(utilizadores[i].password, password) == 0) // Verifica se o email e pass introduzidas existem no array utilizadores
+        if (strcmp(utilizadores[i].email, email) == 0 && strcmp(utilizadores[i].password, password) == 0) // verifica se o email e pass introduzidas existem no array utilizadores
         {
-            return i;  // Retorna o índice do usuário encontrado
+            return i;  // retorna o índice do utilizador encontrado
         }
     }
-    return -1;  // Retorna -1 se o login falhar
+    return -1;  // retorna -1 se o login falhar
 }
 
-// Função para verificar se uma string contém apenas letras
 int contemApenasLetras(const char *str)
 {
     for (int i = 0; str[i] != '\0'; i++)
     {
         if (!isalpha(str[i]))
         {
-            return 0; // Se não for uma letra, retorna 0
+            return 0; // se não for uma letra, retorna 0
         }
     }
-    return 1; // Se passar por todos os caracteres e todos forem letras, retorna 1
+    return 1; // se passar por todos os carateres e todos forem letras, retorna 1
 }
 
-// Função para realizar o registo
 int signup(struct Utilizador utilizadores[], int totalUtilizadores)
 {
     struct Utilizador novoUtilizador;
 
-    // Loop até que o registo seja bem-sucedido
     do
     {
         printf("Nome: ");
         scanf("%s", novoUtilizador.nome);
 
-        // Verifica se o nome contém apenas letras
         if (!contemApenasLetras(novoUtilizador.nome))
         {
             printf("Erro! O nome deve conter apenas letras.\n");
@@ -62,7 +71,6 @@ int signup(struct Utilizador utilizadores[], int totalUtilizadores)
         printf("Email: ");
         scanf("%s", novoUtilizador.email);
 
-        // Verifica se o email contém '@'
         if (strchr(novoUtilizador.email, '@') == NULL)
         {
             printf("Erro! O email deve conter '@'.\n");
@@ -73,15 +81,14 @@ int signup(struct Utilizador utilizadores[], int totalUtilizadores)
         if (scanf("%d", &novoUtilizador.idade) != 1 || novoUtilizador.idade <= 0)
         {
             printf("Erro! Idade inválida. A idade deve ser maior que 0.\n");
-            while (getchar() != '\n');  // Limpa o buffer do teclado
+            while (getchar() != '\n');  // limpa o buffer do teclado
             continue;
         }
 
         printf("Telefone: ");
-        char telefone[20]; // Usamos uma string para armazenar temporariamente o telefone
+        char telefone[20];
         scanf("%s", telefone);
 
-        // Verifica se o telefone contém apenas dígitos
         int valido = 1;
         for (int i = 0; telefone[i] != '\0'; i++)
         {
@@ -98,7 +105,7 @@ int signup(struct Utilizador utilizadores[], int totalUtilizadores)
             continue;
         }
 
-        // Se chegou até aqui, convertemos o telefone para inteiro e atribuímos à estrutura
+        // converter o telefone para inteiro e atribuir à estrutura
         novoUtilizador.contacto = atoi(telefone);
 
         printf("Password: ");
@@ -109,10 +116,9 @@ int signup(struct Utilizador utilizadores[], int totalUtilizadores)
 
         if (strcmp(novoUtilizador.password, novoUtilizador.confirmarPassword) == 0)
         {
-            // Adiciona o novo usuário ao array
             utilizadores[totalUtilizadores] = novoUtilizador;
             printf("Registo bem-sucedido!\n");
-            return totalUtilizadores + 1;  // Retorna o novo total de usuários
+            return totalUtilizadores + 1;
         }
         else
         {
@@ -121,12 +127,166 @@ int signup(struct Utilizador utilizadores[], int totalUtilizadores)
     } while (1);
 }
 
+void procurarLoja(struct Loja lojas[], int totalLojas)
+{
+    char nomeLoja[50];
+    printf("Introduza o nome da loja que deseja procurar: ");
+    getchar(); // limpar o buffer de entrada antes de usar fgets
+    fgets(nomeLoja, sizeof(nomeLoja), stdin);
+    // remover o caratere de nova linha da string lida pelo fgets
+    nomeLoja[strcspn(nomeLoja, "\n")] = '\0';
+    
+    int encontrada = 0;
+    for (int i = 0; i < totalLojas; ++i)
+    {
+        if (strcasecmp(lojas[i].nome, nomeLoja) == 0)
+        {
+            encontrada = 1;
+            printf("Loja encontrada:\n");
+            printf("ID da Loja: %d\n", lojas[i].id);
+            printf("Nome: %s\n", lojas[i].nome);
+            printf("Produtos:\n");
+            for (int j = 0; j < lojas[i].num_componentes; ++j)
+            {
+                printf("ID do Produto: %d, Nome: %s, Custo: %.2f, Quantidade: %d\n",
+                       lojas[i].componentes[j].id,
+                       lojas[i].componentes[j].nome,
+                       lojas[i].componentes[j].custo,
+                       lojas[i].componentes[j].quantidade);
+            }
+            break;
+        }
+    }
+    if (!encontrada)
+    {
+        printf("Loja não encontrada.\n");
+    }
+}
+
+void procurarProduto(struct Loja lojas[], int totalLojas)
+{
+    char nomeProduto[50];
+    printf("Introduza o nome do produto que deseja procurar: ");
+    getchar(); // limpar o buffer de entrada antes de usar fgets
+    fgets(nomeProduto, sizeof(nomeProduto), stdin);
+    // remover o caratere de nova linha da string lida pelo fgets
+    nomeProduto[strcspn(nomeProduto, "\n")] = '\0';
+    
+    int encontrado = 0;
+    for (int i = 0; i < totalLojas; ++i)
+    {
+        for (int j = 0; j < lojas[i].num_componentes; ++j)
+        {
+            if (strcasecmp(lojas[i].componentes[j].nome, nomeProduto) == 0)
+            {
+                encontrado = 1;
+                printf("Produto encontrado:\n");
+                printf("ID da Loja: %d\n", lojas[i].id);
+                printf("ID do Produto: %d, Nome: %s, Custo: %.2f, Quantidade: %d\n",
+                       lojas[i].componentes[j].id,
+                       lojas[i].componentes[j].nome,
+                       lojas[i].componentes[j].custo,
+                       lojas[i].componentes[j].quantidade);
+                break;
+            }
+        }
+    }
+    if (!encontrado)
+    {
+        printf("Produto não encontrado.\n");
+    }
+}
+
+void comprarProdutos(struct Loja lojas[], int totalLojas)
+{
+    int idLoja, idProduto, quantidade;
+    float total = 0.0;
+
+    printf("\nIntroduza o ID da loja: ");
+    scanf("%d", &idLoja);
+
+    if (idLoja < 1 || idLoja > totalLojas) {
+        printf("ID da loja inválido.\n");
+        return;
+    }
+
+    do {
+        printf("\nIntroduza o ID do produto (0 para finalizar a compra): ");
+        scanf("%d", &idProduto);
+
+        if (idProduto == 0) {
+            printf("A finalizar a compra...\n");
+            break;
+        } else if (idProduto < 1 || idProduto > lojas[idLoja - 1].num_componentes) {
+            printf("ID do produto inválido.\n");
+            continue;
+        }
+
+        printf("Introduza a quantidade desejada: ");
+        scanf("%d", &quantidade);
+
+        // verificar se a quantidade desejada está disponível
+        if (quantidade > lojas[idLoja - 1].componentes[idProduto - 1].quantidade) {
+            printf("Quantidade indisponível.\n");
+            continue;
+        }
+
+        // calcular o custo do produto selecionado
+        total += quantidade * lojas[idLoja - 1].componentes[idProduto - 1].custo;
+
+        // atualizar o stock
+        lojas[idLoja - 1].componentes[idProduto - 1].quantidade -= quantidade;
+
+        printf("Produto adicionado ao carrinho.\n");
+
+    } while (idProduto != 0);
+
+    printf("Total da compra: %.2f\n", total);
+
+    char confirmacao;
+    printf("Confirmar compra (s/n): ");
+    scanf(" %c", &confirmacao);
+
+    if (confirmacao == 's' || confirmacao == 'S') {
+        printf("Compra bem-sucedida.\n");
+    } else {
+        printf("Compra cancelada.\n");
+    }
+}
+
 int main()
 {
     struct Utilizador utilizadores[MAX_UTILIZADORES];
     int totalUtilizadores = 0;
 
-    // Ciclo que continua sempre a percorrer até que retorne 0
+    struct Loja lojas[MAX_LOJAS] = {
+        {1, "Loja 1", {}, 0},
+        {2, "Loja 2", {}, 0},
+        {3, "Loja 3", {}, 0},
+        {4, "Loja 4", {}, 0},
+        {5, "Loja 5", {}, 0}
+    };
+
+    lojas[0].componentes[0] = (struct Componente){1, "Grafica RTX 4090", 1799.90, 5};
+    lojas[0].componentes[1] = (struct Componente){2, "Grafica RTX 4080", 1250.00, 10};
+    lojas[0].num_componentes = 2;
+
+    lojas[1].componentes[0] = (struct Componente){3, "Processador i9-14900K", 650.00, 15};
+    lojas[1].componentes[1] = (struct Componente){4, "Processador i7-14700K", 474.90, 20};
+    lojas[1].num_componentes = 2;
+
+    lojas[2].componentes[0] = (struct Componente){5, "Motherboard ATX Asus ROG Z790", 689.90, 20};
+    lojas[2].componentes[1] = (struct Componente){6, "Motherboard ATX Gigabyte X670", 350.90, 35};
+    lojas[2].num_componentes = 2;
+
+    lojas[3].componentes[0] = (struct Componente){7, "Fonte ATX Corsair 1600W", 500.00, 30};
+    lojas[3].componentes[1] = (struct Componente){8, "Fonte ATX CoolerMaster 1250W", 209.90, 40};
+    lojas[3].num_componentes = 2;
+
+    lojas[4].componentes[0] = (struct Componente){9, "RAM Kingston 32GB DDR5", 142.90, 45};
+    lojas[4].componentes[1] = (struct Componente){10, "RAM Kingston 32GB DDR4", 79.90, 60};
+    lojas[4].num_componentes = 2;
+
     while (1)
     {
         int escolha;
@@ -150,27 +310,34 @@ int main()
 
                     if (index != -1) {
                         printf("Login bem-sucedido! Bem-vindo, %s!\n", utilizadores[index].nome);
-                        // Após o login bem-sucedido, ofereça opções adicionais
+
                         int opcao;
                         do {
-                            printf("\n1. Procurar por loja\n2. Procurar por produto\n3. Voltar para a página de login/signup\nEscolha: ");
+                            printf("\n1. Procurar por loja\n2. Procurar por produto\n3. Comprar produtos\n4. Voltar para a página principal\nEscolha: ");
                             scanf("%d", &opcao);
                             switch (opcao) {
                                 case 1:
-                                    printf("Opção 'Procurar por loja' selecionada.\n");
-                                    // Lógica para procurar por loja
+                                    {
+                                        procurarLoja(lojas, MAX_LOJAS);
+                                    }
                                     break;
                                 case 2:
-                                    printf("Opção 'Procurar por produto' selecionada.\n");
-                                    // Lógica para procurar por produto
+                                    {
+                                        procurarProduto(lojas, MAX_LOJAS);
+                                    }
                                     break;
                                 case 3:
-                                    printf("Voltando para a página de login/signup...\n");
+                                    {
+                                        comprarProdutos(lojas, MAX_LOJAS);
+                                    }
+                                    break;
+                                case 4:
+                                    printf("A voltar para a página principal...\n");
                                     break;
                                 default:
-                                    printf("Opção inválida. Por favor, escolha novamente.\n");
+                                    printf("Opção inválida.\n");
                             }
-                        } while (opcao != 3); // Continue até que o usuário opte por voltar
+                        } while (opcao != 4);
                     } else {
                         printf("Login incorreto.\n");
                     }
